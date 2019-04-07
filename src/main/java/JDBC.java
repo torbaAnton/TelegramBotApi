@@ -1,4 +1,4 @@
-
+/*
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class JDBC {
              password - собственно пароль ваше базы
              */
 
-
+/*
             if (connection == null) {
                 System.out.println("Failed to make connection!");
             } else {
@@ -76,3 +76,5 @@ public class JDBC {
     }
 
 }
+
+ */
