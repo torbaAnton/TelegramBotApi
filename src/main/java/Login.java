@@ -9,8 +9,7 @@ public class Login {
     public Login() {
         try {
             Class.forName("org.postgresql.Driver");
-            con = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/myProgram\", \"postgres\",\n" +
-                    "                    \"keufycr1997");
+            con = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/myProgram", "postgres","keufycr1997");
             st = con.createStatement();
         } catch (Exception e) {
             System.out.println("Error: " + e);
@@ -60,7 +59,7 @@ public class Login {
     public void remove (String name){
         PreparedStatement st = null;
         try{
-            st = con.prepareStatement("DELETE FROM user WHERE name = ?");
+            st = con.prepareStatement("DELETE FROM users WHERE name = ?");
             st.setString(1,name);
             st.executeUpdate();
         }catch (SQLException e){

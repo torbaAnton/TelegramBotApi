@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
+    private String chat_id;
+    private String nameUser = "";
+    Login login = new Login();
+
     public static void main(String[] args) {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -125,29 +129,41 @@ public class Bot extends TelegramLongPollingBot {
 
 
     public void onUpdateReceived(Update update) {
+        update.getUpdateId();
+        SendMessage sendMessage = new SendMessage().setChatId(update.getMessage().getChatId());
+        chat_id = String.valueOf(update.getMessage().getChatId());
+        nameUser = update.getMessage().getFrom().getUserName();
+        String text = update.getMessage().getText();
+        try{
+            sendMessage.setText(getMsg(text));
+            execute(sendMessage);
+            System.out.println(update.getMessage().getFrom().getUserName() + ": " + update.getMessage().getText());
+        }catch (TelegramApiException e){
+            e.printStackTrace();
+        }
         Message message = update.getMessage();
-        String name = "Питание";
+        String name1 = "Питание";
         if (message != null && message.hasText()) {
             switch (message.getText()) {
                 case "Тренировки":
-                    sendMsgSex(message, "Выберите ваш пол: ");
+                    sendMsgProgram(message, "Выберите: ");
                     break;
                 case "Питание":
-                    if (name.contains("Питание"))
+                    if (name1.contains("Питание"))
                         sendMsgProgram(message, "Что желаете?");
                     else
                         sendMsgSex(message, "Выберите ваш пол");
                     break;
                 case "Мужской":
-                    sendMsgAge(message, "Выберите ваш возраст");
+                    sendMsgAge(message, "Выберите ваш возраст:");
                     break;
                 case "Женский":
-                    sendMsgAge(message, "Выберите ваш возраст");
+                    sendMsgAge(message, "Выберите ваш возраст:");
                     break;
-                case "16-25":
+                case "16-18":
                     sendMsgHeight(message, "Выберите ваш рост");
                     break;
-                case "25-35":
+                case "18-35":
                     sendMsgHeight(message, "Выберите ваш рост");
                     break;
                 case "35+":
@@ -172,40 +188,40 @@ public class Bot extends TelegramLongPollingBot {
                     sendMsgWeight(message, "Выберите ваш вес");
                     break;
                 case "менее 40":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "40-45":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "45-50":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "50-55":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "55-60":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "60-65":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "65-70":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "70-75":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "75-80":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "80-90":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "90-100":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "более 100":
-                    sendMsgProgram(message, "Что желаете?");
+                    sendMsgType(message, "Что желаете?");
                     break;
                 case "Снизить вес":
                     sendMsg(message, "Кардио");
@@ -217,8 +233,10 @@ public class Bot extends TelegramLongPollingBot {
                     sendMsg(message, "Силовые тренировки");
                     break;
                 case "/start":
-                    sendMsgType(message, "Здравствуйте, рад вас видеть. Я помогу вам с вашими тренировками и питанием, выберите ниже, что именно вас интересует: ");
+                    sendMsgSex(message, "Здравствуйте, рад вас видеть. Я помогу вам с вашими тренировками и питанием. Давайте укажем ваши данные. Выбирайте данные ниже. Ваш пол: ");
                     break;
+                case "Назад":
+                    sendMsgSex(message,"Выберите данные заново: ");
                 default:
 
             }
@@ -236,6 +254,7 @@ public class Bot extends TelegramLongPollingBot {
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         keyboardFirstRow.add(new KeyboardButton("Питание"));
         keyboardFirstRow.add(new KeyboardButton("Тренировки"));
+        keyboardFirstRow.add(new KeyboardButton("Назад"));
         keyboardRowList.add(keyboardFirstRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
     }
@@ -262,9 +281,10 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(new KeyboardButton("16-25"));
-        keyboardFirstRow.add(new KeyboardButton("25-35"));
+        keyboardFirstRow.add(new KeyboardButton("16-18"));
+        keyboardFirstRow.add(new KeyboardButton("18-35"));
         keyboardFirstRow.add(new KeyboardButton("35+"));
+        keyboardFirstRow.add(new KeyboardButton("Назад"));
         keyboardRowList.add(keyboardFirstRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
     }
@@ -284,6 +304,7 @@ public class Bot extends TelegramLongPollingBot {
         keyboardSecondRow.add(new KeyboardButton("170-180"));
         keyboardSecondRow.add(new KeyboardButton("180-190"));
         keyboardSecondRow.add(new KeyboardButton("более 190"));
+        keyboardSecondRow.add(new KeyboardButton("Назад"));
         keyboardRowList.add(keyboardFirstRow);
         keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
@@ -311,6 +332,7 @@ public class Bot extends TelegramLongPollingBot {
         keyboardThirdRow.add(new KeyboardButton("80-90"));
         keyboardThirdRow.add(new KeyboardButton("90-100"));
         keyboardThirdRow.add(new KeyboardButton("более 100"));
+        keyboardThirdRow.add(new KeyboardButton("Назад"));
         keyboardRowList.add(keyboardFirstRow);
         keyboardRowList.add(keyboardSecondRow);
         keyboardRowList.add(keyboardThirdRow);
@@ -330,15 +352,31 @@ public class Bot extends TelegramLongPollingBot {
         keyboardSecondRow.add(new KeyboardButton("Поддерживать вес"));
         KeyboardRow keyboardThirdRow = new KeyboardRow();
         keyboardThirdRow.add(new KeyboardButton("Набрать вес"));
+        KeyboardRow keyboardFourthRow = new KeyboardRow();
+        keyboardFourthRow.add(new KeyboardButton("Назад"));
         keyboardRowList.add(keyboardFirstRow);
         keyboardRowList.add(keyboardSecondRow);
         keyboardRowList.add(keyboardThirdRow);
+        keyboardRowList.add(keyboardFourthRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
     }
 
-    public void keyboardGet(){
-
-
+    public String getMsg(String msg){
+        if (msg.contains("/remove")){
+            msg.replace("/remove ","");
+            login.remove(msg);
+        }
+        if (msg.contains("/add")){
+            login.add(nameUser, chat_id);
+        }
+if (msg.contains("/change")){
+    msg.replace("/change","");
+    login.change("gc", chat_id);
+}
+if(msg.contains("/get")){
+    return login.getChatID().toString();
+}
+return "OK";
     }
     public String getBotUsername() {
         return "CoachBot";
