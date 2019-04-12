@@ -1,3 +1,5 @@
+package login;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -29,7 +31,7 @@ public class Login {
         }
         return "Информация добавлена!";
     }
-    public void change(String newName, String id_chat){
+   /* public void change(String newName, String id_chat){
         try{
             PreparedStatement st = con.prepareStatement("UPDATE users SET name = ? WHERE chat_id=?");
             st.setString(1, newName);
@@ -65,5 +67,5 @@ public class Login {
         }catch (SQLException e){
             e.printStackTrace();
         }
-    }
+    }*/
 }
