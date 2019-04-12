@@ -352,9 +352,7 @@ public class Bot extends TelegramLongPollingBot {
         return "CoachBot";
     }
 
-    public String getBotToken() {
-        return "752974627:AAGhyGf2FYZsMitGJs22OSWjwhDL-ThqOWU";
-    }
+
 
     private void setUpKeyboard(ReplyKeyboardMarkup replyKeyboardMarkup, boolean b) {
         replyKeyboardMarkup.setSelective(true);
