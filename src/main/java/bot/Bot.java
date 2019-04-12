@@ -23,12 +23,14 @@ import java.util.Map;
 public class Bot extends TelegramLongPollingBot {
     private String chat_id;
     private String nameUser = "";
+    private String nameReal = "";
+   // private String sexUser = "";
     Login login = new Login();
-    private Map<Command, String> commandMap = new HashMap<>();
+   // private Map<Command, String> commandMap = new HashMap<>();
 
     public static void main(String[] args) {
-        Bot bot = new Bot();
-        bot.fillInMap();
+        //Bot bot = new Bot();
+        //bot.fillInMap();
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
@@ -40,7 +42,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    private void fillInMap(){
+   /* private void fillInMap(){
         commandMap.put(new MessageAgeCommand(this), "Выберите ваш возраст:");
         commandMap.put(new MessageCommand(this), "Что желаете?");
         commandMap.put(new MessageHeightCommand(this), "Выберите ваш рост");
@@ -49,7 +51,7 @@ public class Bot extends TelegramLongPollingBot {
         commandMap.put(new MessageTypeCommand(this), "Что желаете?");
         commandMap.put(new MessageWeightCommand(this), "Выберите ваш вес:");
     }
-
+*/
     public void sendMsgType(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
         try {
@@ -75,11 +77,13 @@ public class Bot extends TelegramLongPollingBot {
         SendMessage sendMessage = new SendMessage().setChatId(update.getMessage().getChatId());
         chat_id = String.valueOf(update.getMessage().getChatId());
         nameUser = update.getMessage().getFrom().getUserName();
+        nameReal = update.getMessage().getFrom().getFirstName()+" "+update.getMessage().getFrom().getLastName();
+        //sexUser = update.getMessage().getText();
 //        String command = update.getMessage().getText();
 //        executeCommand(command);
 //            sendMessage.setText(executeCommand(text));
 //            execute(sendMessage);
-        System.out.println(update.getMessage().getFrom().getUserName() + ": " + update.getMessage().getText());
+        System.out.println(update.getMessage().getFrom().getFirstName()+" " +update.getMessage().getFrom().getLastName() + ": " + update.getMessage().getText());
         Message message = update.getMessage();
         String name1 = "Питание";
         if (message != null && message.hasText()) {
@@ -95,9 +99,11 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 case "Мужской":
                     sendMsgAge(message, "Выберите ваш возраст:");
+                    //addSex();
                     break;
                 case "Женский":
                     sendMsgAge(message, "Выберите ваш возраст:");
+                   // addSex();
                     break;
                 case "16-18":
                     sendMsgHeight(message, "Выберите ваш рост");
@@ -338,8 +344,9 @@ public class Bot extends TelegramLongPollingBot {
 */
 
     private void addUser() {
-        login.add(nameUser, chat_id);
+        login.addUser(nameUser, chat_id, nameReal);
     }
+   // private void addSex() {login.addSex(sexUser); }
 
     public String getBotUsername() {
         return "CoachBot";
