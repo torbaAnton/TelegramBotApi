@@ -1,8 +1,10 @@
 package bot;
 
-import command.Command;
-import command.impl.*;
-import login.Login;
+import action.Action;
+import action.impl.AgeAction;
+import action.impl.SexAction;
+import action.impl.TrainingsAction;
+import login.DBManager;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -24,13 +26,15 @@ public class Bot extends TelegramLongPollingBot {
     private String chat_id;
     private String nameUser = "";
     private String nameReal = "";
-   // private String sexUser = "";
-    Login login = new Login();
-   // private Map<Command, String> commandMap = new HashMap<>();
+    DBManager DBManager = new DBManager();
+    private Map<String, Action> actionMap;
+
+    {
+        actionMap = new HashMap<>();
+        actionMap.put("Тренировки", new TrainingsAction(this));
+    }
 
     public static void main(String[] args) {
-        //Bot bot = new Bot();
-        //bot.fillInMap();
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
@@ -42,70 +46,40 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-   /* private void fillInMap(){
-        commandMap.put(new MessageAgeCommand(this), "Выберите ваш возраст:");
-        commandMap.put(new MessageCommand(this), "Что желаете?");
-        commandMap.put(new MessageHeightCommand(this), "Выберите ваш рост");
-        commandMap.put(new MessageProgramCommand(this), "Выберите:");
-        commandMap.put(new MessageSexCommand(this), "Выберите ваш пол:");
-        commandMap.put(new MessageTypeCommand(this), "Что желаете?");
-        commandMap.put(new MessageWeightCommand(this), "Выберите ваш вес:");
-    }
-*/
-    public void sendMsgType(Message message, String text) {
-        SendMessage sendMessage = getSendMessage(message, text);
-        try {
-            setButtonsType(sendMessage);
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendMsgSex(Message message, String text) {
-        SendMessage sendMessage = getSendMessage(message, text);
-        try {
-            setButtonsSex(sendMessage);
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void onUpdateReceived(Update update) {
         update.getUpdateId();
         SendMessage sendMessage = new SendMessage().setChatId(update.getMessage().getChatId());
         chat_id = String.valueOf(update.getMessage().getChatId());
         nameUser = update.getMessage().getFrom().getUserName();
-        nameReal = update.getMessage().getFrom().getFirstName()+" "+update.getMessage().getFrom().getLastName();
+        nameReal = update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName();
         //sexUser = update.getMessage().getText();
 //        String command = update.getMessage().getText();
 //        executeCommand(command);
 //            sendMessage.setText(executeCommand(text));
 //            execute(sendMessage);
-        System.out.println(update.getMessage().getFrom().getFirstName()+" " +update.getMessage().getFrom().getLastName() + ": " + update.getMessage().getText());
+        System.out.println(update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + ": " + update.getMessage().getText());
         Message message = update.getMessage();
-        String name1 = "Питание";
         if (message != null && message.hasText()) {
+//            Action action = actionMap.get(message.getText());
+//            action.execute(message);
             switch (message.getText()) {
                 case "Тренировки":
                     sendMsgProgram(message, "Выберите: ");
                     break;
                 case "Питание":
-                    if (name1.contains("Питание"))
-                        sendMsgProgram(message, "Что желаете?");
-                    else
-                        sendMsgSex(message, "Выберите ваш пол");
+                    sendMsgProgram(message, "Что желаете?");
                     break;
                 case "Мужской":
-                    sendMsgAge(message, "Выберите ваш возраст:");
+                    new SexAction(this).execute(message);
+//                    sendMsgAge(message, "Выберите ваш возраст:");
                     //addSex();
                     break;
                 case "Женский":
                     sendMsgAge(message, "Выберите ваш возраст:");
-                   // addSex();
+                    // addSex();
                     break;
                 case "16-18":
+                    new AgeAction(this).execute(message);
                     sendMsgHeight(message, "Выберите ваш рост");
                     break;
                 case "18-35":
@@ -129,10 +103,10 @@ public class Bot extends TelegramLongPollingBot {
                 case "180-190":
                     sendMsgWeight(message, "Выберите ваш вес");
                     break;
-                case "более 190":
+                case "Более 190":
                     sendMsgWeight(message, "Выберите ваш вес");
                     break;
-                case "менее 40":
+                case "Менее 40":
                     sendMsgType(message, "Что желаете?");
                     break;
                 case "40-45":
@@ -165,7 +139,7 @@ public class Bot extends TelegramLongPollingBot {
                 case "90-100":
                     sendMsgType(message, "Что желаете?");
                     break;
-                case "более 100":
+                case "Более 100":
                     sendMsgType(message, "Что желаете?");
                     break;
                 case "Снизить вес":
@@ -189,48 +163,64 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
+    public void sendMsgType(Message message, String text) {
+        SendMessage sendMessage = getSendMessage(message, text);
+        sendMsgAndSetButton(sendMessage, "Type");
+    }
+
+    public void sendMsgSex(Message message, String text) {
+        SendMessage sendMessage = getSendMessage(message, text);
+        sendMsgAndSetButton(sendMessage, "Sex");
+    }
+
     public void sendMsgAge(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
-        try {
-            setButtonsAge(sendMessage);
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        sendMsgAndSetButton(sendMessage, "Age");
     }
 
     public void sendMsgHeight(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
-        try {
-            setButtonsHeight(sendMessage);
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        sendMsgAndSetButton(sendMessage, "Height");
     }
 
     public void sendMsgWeight(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
-        try {
-            setButtonsWeight(sendMessage);
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        sendMsgAndSetButton(sendMessage, "Weight");
     }
 
     public void sendMsgProgram(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
-        try {
-            setButtonsProgram(sendMessage);
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        sendMsgAndSetButton(sendMessage, "Program");
     }
 
     public void sendMsg(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
+        sendMsgAndSetButton(sendMessage, "Msg");
+    }
+
+
+    private void sendMsgAndSetButton(SendMessage sendMessage, String buttonType){
+        switch (buttonType){
+            case "Type":
+                setButtonsType(sendMessage);
+                break;
+            case "Sex":
+                setButtonsSex(sendMessage);
+                break;
+            case "Age":
+                setButtonsAge(sendMessage);
+                break;
+            case "Height":
+                setButtonsHeight(sendMessage);
+                break;
+            case "Program":
+                setButtonsProgram(sendMessage);
+                break;
+            case "Weight":
+                setButtonsWeight(sendMessage);
+                break;
+            default:
+        }
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -238,121 +228,80 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-
-
     public void setButtonsType(SendMessage sendMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, false);
-        List<KeyboardRow> keyboardRowList = new ArrayList<>()
-                ;
         List<KeyboardButton> firstRowButtons = setUpButtons("Питание", "Тренировки", "Назад");
-
-        KeyboardRow keyboardFirstRow = getKeyBoardRow(firstRowButtons);
-        keyboardRowList.add(keyboardFirstRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+        setUpKeyboard(sendMessage, false, firstRowButtons);
     }
 
     public void setButtonsSex(SendMessage sendMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, false);
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-
         List<KeyboardButton> firstRowButtons = setUpButtons("Мужской", "Женский");
-
-        KeyboardRow keyboardFirstRow = getKeyBoardRow(firstRowButtons);
-
-        keyboardRowList.add(keyboardFirstRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+        setUpKeyboard(sendMessage, false, firstRowButtons);
     }
 
     public void setButtonsAge(SendMessage sendMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, false);
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-
         List<KeyboardButton> firstRowButtons = setUpButtons("16-18", "18-35", "35+", "Назад");
-
-        KeyboardRow keyboardFirstRow = getKeyBoardRow(firstRowButtons);
-
-        keyboardRowList.add(keyboardFirstRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+        setUpKeyboard(sendMessage, false, firstRowButtons);
     }
 
     public void setButtonsHeight(SendMessage sendMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, false);
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-
         List<KeyboardButton> firstRowButtons = setUpButtons("Менее 150", "150-160", "160-170");
         List<KeyboardButton> secondRowButtons = setUpButtons("170-180", "180-190", "Более 190", "Назад");
-
-        KeyboardRow keyboardFirstRow = getKeyBoardRow(firstRowButtons);
-        KeyboardRow keyboardSecondRow = getKeyBoardRow(secondRowButtons);
-
-        keyboardRowList.add(keyboardFirstRow);
-        keyboardRowList.add(keyboardSecondRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+        setUpKeyboard(sendMessage, false, firstRowButtons, secondRowButtons);
     }
 
     public void setButtonsWeight(SendMessage sendMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, false);
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-
         List<KeyboardButton> firstRowButtons = setUpButtons("Менее 40", "40-45", "50-55");
         List<KeyboardButton> secondRowButtons = setUpButtons("55-60", "60-65", "65-70", "70-75");
         List<KeyboardButton> thirdRowButtons = setUpButtons("75-80", "80-90", "90-100", "100+", "Назад");
-
-        KeyboardRow keyboardFirstRow = getKeyBoardRow(firstRowButtons);
-        KeyboardRow keyboardSecondRow = getKeyBoardRow(secondRowButtons);
-        KeyboardRow keyboardThirdRow = getKeyBoardRow(thirdRowButtons);
-
-        keyboardRowList.add(keyboardFirstRow);
-        keyboardRowList.add(keyboardSecondRow);
-        keyboardRowList.add(keyboardThirdRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+        setUpKeyboard(sendMessage, false, firstRowButtons, secondRowButtons, thirdRowButtons);
     }
 
     public void setButtonsProgram(SendMessage sendMessage) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, true);
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-
         List<KeyboardButton> firstRowButtons = setUpButtons("Снизить вес");
         List<KeyboardButton> secondRowButtons = setUpButtons("Поддерживать вес");
         List<KeyboardButton> thirdRowButtons = setUpButtons("Набрать вес");
         List<KeyboardButton> fourthRowButtons = setUpButtons("Назад");
-        KeyboardRow keyboardFirstRow = getKeyBoardRow(firstRowButtons);
-        KeyboardRow keyboardSecondRow = getKeyBoardRow(secondRowButtons);
-        KeyboardRow keyboardThirdRow = getKeyBoardRow(thirdRowButtons);
-        KeyboardRow keyboardFourthRow = getKeyBoardRow(fourthRowButtons);
-        keyboardRowList.add(keyboardFirstRow);
-        keyboardRowList.add(keyboardSecondRow);
-        keyboardRowList.add(keyboardThirdRow);
-        keyboardRowList.add(keyboardFourthRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+        setUpKeyboard(sendMessage, true, firstRowButtons, secondRowButtons, thirdRowButtons, fourthRowButtons);
     }
 
+
+    private void setUpKeyboard(SendMessage sendMessage, boolean oneTimeKeyboard, List<KeyboardButton>... rowButtons){
+        ReplyKeyboardMarkup replyKeyboardMarkup = getReplyKeyboardMarkup(sendMessage, oneTimeKeyboard);
+        List<KeyboardRow> keyboardRowList = new ArrayList<>();
+        for (List<KeyboardButton> list : rowButtons){
+            KeyboardRow keyBoardRow = getKeyBoardRow(list);
+            keyboardRowList.add(keyBoardRow);
+        }
+        replyKeyboardMarkup.setKeyboard(keyboardRowList);
+    }
 /*
     public void executeCommand(String command) {
         if (command.contains("/remove")) {
             msg.replace("/remove ", "");
-            login.remove(command);
+            DBManager.remove(command);
         }
         if (command.contains("/change")) {
             command.replace("/change", "");
-            login.change("gc", chat_id);
+            DBManager.change("gc", chat_id);
         }
         if (command.contains("/get")) {
-            login.getChatID().toString();
+            DBManager.getChatID().toString();
         }
     }
 */
 
     private void addUser() {
-        login.addUser(nameUser, chat_id, nameReal);
+        DBManager.addUser(nameUser, Integer.parseInt(chat_id), nameReal);
     }
-   // private void addSex() {login.addSex(sexUser); }
+    // private void addSex() {DBManager.addSex(sexUser); }
 
     public String getBotUsername() {
         return "CoachBot";
     }
 
-
+    public String getBotToken() {
+        return "752974627:AAGhyGf2FYZsMitGJs22OSWjwhDL-ThqOWU";
+    }
 
     private void setUpKeyboard(ReplyKeyboardMarkup replyKeyboardMarkup, boolean b) {
         replyKeyboardMarkup.setSelective(true);
@@ -360,15 +309,15 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setOneTimeKeyboard(b);
     }
 
-    private KeyboardRow getKeyBoardRow(List<KeyboardButton> buttons){
+    private KeyboardRow getKeyBoardRow(List<KeyboardButton> buttons) {
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.addAll(buttons);
         return keyboardRow;
     }
 
-    private List<KeyboardButton> setUpButtons(String ... names){
+    private List<KeyboardButton> setUpButtons(String... names) {
         List<KeyboardButton> buttons = new ArrayList<>();
-        for (String name : names){
+        for (String name : names) {
             buttons.add(new KeyboardButton(name));
         }
         return buttons;
