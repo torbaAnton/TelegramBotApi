@@ -1,5 +1,6 @@
 package login;
 
+import enteties.Diet;
 import enteties.Program;
 import enteties.User;
 
@@ -9,8 +10,13 @@ public class DBManager {
     private static final String ADD_USER_SQL = "INSERT INTO users(chat_id, name, real_name)VALUES (?,?,?)";
     private static final String UPDATE_SEX_SQL = "UPDATE users SET sex = ? WHERE chat_id = ?";
     private static final String UPDATE_AGE_SQL = "UPDATE users SET age = ? WHERE chat_id = ?";
+    private static final String UPDATE_HEIGHT_SQL = "UPDATE users SET height = ? WHERE chat_id = ?" ;
+    private static final String UPDATE_WEIGHT_SQL = "UPDATE users SET weight = ? WHERE chat_id = ?" ;
+    private static final String UPDATE_ACTIVITY_SQL ="UPDATE users SET activity = ? WHERE chat_id = ?";
     private static final String GET_PROGRAM_BY_AGE_AND_SEX_SQL = "SELECT * FROM train_programs WHERE age = ? AND sex = ?";
     private static final String GET_USER_SQL = "SELECT * FROM users WHERE chat_id = ?";
+    private static final String GET_PROGRAM_BY_AGE_AND_SEX_AND_HEIGHT_AND_WEIGHT_AND_ACTIVITY_SQL = "SELECT * FROM diet_programs WHERE age = ? AND sex = ? AND height = ? AND weight = ?" +
+            "AND activity = ?";
     private static Connection con;
     private Statement st;
     private ResultSet rs;
@@ -42,9 +48,9 @@ public class DBManager {
             pstm.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error" + e);
-            return "Информацию не удалось добавить";
+            return "Failure";
         }
-        return "Информация добавлена!";
+        return "It's OK!";
     }
 
     public User getUser(int chatId){
@@ -53,14 +59,19 @@ public class DBManager {
             PreparedStatement pstm = con.prepareStatement(GET_USER_SQL);
             pstm.setInt(1, chatId);
             ResultSet resultSet = pstm.executeQuery();
-            user = new User();
-            user.setAge(resultSet.getString("age"));
-            user.setChatId(resultSet.getInt("chat_id"));
-            user.setDietProgramId(resultSet.getString("diet_program_id"));
-            user.setName(resultSet.getString("name"));
-            user.setRealName(resultSet.getString("real_name"));
-            user.setSex(resultSet.getString("sex"));
-            user.setTrainProgramId(resultSet.getString("train_program_id"));
+            if (resultSet.next()){
+                user = new User();
+                user.setAge(resultSet.getString("age"));
+                user.setChatId(resultSet.getInt("chat_id"));
+                user.setDietProgramId(resultSet.getString("diet_program_id"));
+                user.setName(resultSet.getString("name"));
+                user.setRealName(resultSet.getString("real_name"));
+                user.setSex(resultSet.getString("sex"));
+                user.setTrainProgramId(resultSet.getString("train_program_id"));
+                user.setHeight(resultSet.getString("height"));
+                user.setWeight(resultSet.getString("weight"));
+                user.setActivity(resultSet.getString("activity"));
+            }
         } catch (SQLException e) {
             System.out.println("Error" + e);
         }
@@ -75,6 +86,12 @@ public class DBManager {
         return setStringAndExecute(age, chat_id, UPDATE_AGE_SQL);
     }
 
+    public String updateHeight(String height, int chat_id) { return setStringAndExecute(height, chat_id, UPDATE_HEIGHT_SQL);}
+
+    public String updateWeight(String weight, int chat_id) { return setStringAndExecute(weight, chat_id, UPDATE_WEIGHT_SQL);}
+
+    public String updateActivity(String activity, int chat_id) { return setStringAndExecute(activity, chat_id, UPDATE_ACTIVITY_SQL); }
+
     public Program getProgramByAgeAndSex(String age, String sex){
         Program program = null;
         try {
@@ -82,15 +99,39 @@ public class DBManager {
             pstm.setString(1, age);
             pstm.setString(2, sex);
             ResultSet resultSet = pstm.executeQuery();
-            program = new Program();
-            program.setBulk(resultSet.getString("bulk"));
-            program.setFatLoss(resultSet.getString("fat_loss"));
-            program.setFit(resultSet.getString("fit"));
+            if (resultSet.next()) {
+                program = new Program();
+                program.setBulk(resultSet.getString("bulk"));
+                program.setFatLoss(resultSet.getString("fat_loss"));
+                program.setFit(resultSet.getString("fit"));
+            }
         } catch (SQLException e) {
             System.out.println("Error" + e);
         }
         return program;
     }
+    public Diet getDietByAgeAndSexAndHeightAndWeightAndActivity(String age, String sex, String height, String weight, String activity){
+        Diet diet = null;
+        try {
+            PreparedStatement pstm = con.prepareStatement(GET_PROGRAM_BY_AGE_AND_SEX_AND_HEIGHT_AND_WEIGHT_AND_ACTIVITY_SQL);
+            pstm.setString(1, age);
+            pstm.setString(2, sex);
+            pstm.setString(3, height);
+            pstm.setString(4, weight);
+            pstm.setString(5, activity);
+            ResultSet resultSet = pstm.executeQuery();
+            if (resultSet.next()) {
+                diet = new Diet();
+                diet.setDietBulk(resultSet.getString("bulk_diet"));
+                diet.setDietFatLoss(resultSet.getString("fat_loss_diet"));
+                diet.setDietFit(resultSet.getString("keep_fit_diet"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error" + e);
+        }
+        return diet;
+    }
+
 
     private String setStringAndExecute(String firstParam, int chat_id, String updateSql) {
         try {
@@ -100,46 +141,8 @@ public class DBManager {
             pstm.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error" + e);
-            return "Информацию не удалось добавить";
+            return "Failure";
         }
-        return "Информация добавлена!";
+        return "It's OK!";
     }
-
-   /* public void change(String newName, String id_chat){
-        try{
-            PreparedStatement st = con.prepareStatement("UPDATE users SET name = ? WHERE chat_id=?");
-            st.setString(1, newName);
-            st.setString(2, id_chat);
-            st.executeUpdate();
-        }catch(Exception ex){
-            System.out.println(ex);
-        }
-    }
-    public ArrayList getChatID(){
-        ArrayList<String> list = null;
-        try{
-            list = new ArrayList<>();
-            PreparedStatement st = null;
-            String query = "select * FROM users";
-            st = con.prepareStatement(query);
-            rs = st.executeQuery();
-
-            while (rs.next()){
-                list.add(rs.getString("chat_id"));
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return list;
-    }
-    public void remove (String name){
-        PreparedStatement st = null;
-        try{
-            st = con.prepareStatement("DELETE FROM users WHERE name = ?");
-            st.setString(1,name);
-            st.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-    }*/
 }

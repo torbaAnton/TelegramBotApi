@@ -8,11 +8,14 @@ public class User {
     private String age;
     private String trainProgramId;
     private String dietProgramId;
+    private String height;
+    private String weight;
+    private String activity;
 
     public User() {
     }
 
-    public User(int chatId, String name, String realName, String sex, String age, String trainProgramId, String dietProgramId) {
+    public User(int chatId, String name, String realName, String sex, String age, String trainProgramId, String dietProgramId, String height, String weight, String activity) {
         this.chatId = chatId;
         this.name = name;
         this.realName = realName;
@@ -20,11 +23,12 @@ public class User {
         this.age = age;
         this.trainProgramId = trainProgramId;
         this.dietProgramId = dietProgramId;
+        this.height = height;
+        this.weight = weight;
+        this.activity = activity;
     }
 
-    public int getChatId() {
-        return chatId;
-    }
+    public int getChatId() { return chatId; }
 
     public void setChatId(int chatId) {
         this.chatId = chatId;
@@ -76,5 +80,29 @@ public class User {
 
     public void setDietProgramId(String dietProgramId) {
         this.dietProgramId = dietProgramId;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public void setWeight(String weight) {
+        this.weight = weight;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
     }
 }

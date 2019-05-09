@@ -1,9 +1,7 @@
 package bot;
 
 import action.Action;
-import action.impl.AgeAction;
-import action.impl.SexAction;
-import action.impl.TrainingsAction;
+import action.impl.*;
 import login.DBManager;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -31,7 +29,43 @@ public class Bot extends TelegramLongPollingBot {
 
     {
         actionMap = new HashMap<>();
+        actionMap.put("/start", new StartAction(this));
+        actionMap.put("Мужской", new SexAction(this));
+        actionMap.put("Женский", new SexAction(this));
+        actionMap.put("16-18", new AgeAction(this));
+        actionMap.put("18-35", new AgeAction(this));
+        actionMap.put("35+", new AgeAction(this));
+        actionMap.put("150-160", new HeightAction(this));
+        actionMap.put("160-170", new HeightAction(this));
+        actionMap.put("170-180", new HeightAction(this));
+        actionMap.put("180-190", new HeightAction(this));
+        actionMap.put("190-200", new HeightAction(this));
+        actionMap.put("40-45", new WeightAction(this));
+        actionMap.put("45-50", new WeightAction(this));
+        actionMap.put("50-55", new WeightAction(this));
+        actionMap.put("55-60", new WeightAction(this));
+        actionMap.put("60-65", new WeightAction(this));
+        actionMap.put("65-70", new WeightAction(this));
+        actionMap.put("70-75", new WeightAction(this));
+        actionMap.put("75-80", new WeightAction(this));
+        actionMap.put("80-90", new WeightAction(this));
+        actionMap.put("90-100", new WeightAction(this));
+        actionMap.put("Более 100", new WeightAction(this));
         actionMap.put("Тренировки", new TrainingsAction(this));
+        actionMap.put("Питание", new FoodAction(this));
+        actionMap.put("Поддерживать вес", new FitAction(this));
+        actionMap.put("Набрать вес", new BulkAction(this));
+        actionMap.put("Снизить вес", new FatLossAction(this));
+        actionMap.put("Назад", new BackAction(this));
+        actionMap.put("Диета для снижения веса", new FatLossDietAction(this));
+        actionMap.put("Диета для поддержания веса", new FitDietAction(this));
+        actionMap.put("Диета для набора веса", new BulkDietAction(this));
+        actionMap.put("Минимальный", new ActivityAction(this));
+        actionMap.put("Низкий", new ActivityAction(this));
+        actionMap.put("Средний", new ActivityAction(this));
+        actionMap.put("Высокий", new ActivityAction(this));
+        actionMap.put("Очень высокий", new ActivityAction(this));
+        actionMap.put("Функции", new HelpAction(this));
     }
 
     public static void main(String[] args) {
@@ -52,114 +86,20 @@ public class Bot extends TelegramLongPollingBot {
         chat_id = String.valueOf(update.getMessage().getChatId());
         nameUser = update.getMessage().getFrom().getUserName();
         nameReal = update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName();
-        //sexUser = update.getMessage().getText();
-//        String command = update.getMessage().getText();
-//        executeCommand(command);
-//            sendMessage.setText(executeCommand(text));
-//            execute(sendMessage);
         System.out.println(update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + ": " + update.getMessage().getText());
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
-//            Action action = actionMap.get(message.getText());
-//            action.execute(message);
+           Action action = actionMap.get(message.getText());
+           action.execute(message);
+
             switch (message.getText()) {
-                case "Тренировки":
-                    sendMsgProgram(message, "Выберите: ");
-                    break;
-                case "Питание":
-                    sendMsgProgram(message, "Что желаете?");
-                    break;
-                case "Мужской":
-                    new SexAction(this).execute(message);
-//                    sendMsgAge(message, "Выберите ваш возраст:");
-                    //addSex();
-                    break;
-                case "Женский":
-                    sendMsgAge(message, "Выберите ваш возраст:");
-                    // addSex();
-                    break;
-                case "16-18":
-                    new AgeAction(this).execute(message);
-                    sendMsgHeight(message, "Выберите ваш рост");
-                    break;
-                case "18-35":
-                    sendMsgHeight(message, "Выберите ваш рост");
-                    break;
-                case "35+":
-                    sendMsgHeight(message, "Выберите ваш рост");
-                    break;
-                case "менее 150":
-                    sendMsgWeight(message, "Выберите ваш вес");
-                    break;
-                case "150-160":
-                    sendMsgWeight(message, "Выберите ваш вес");
-                    break;
-                case "160-170":
-                    sendMsgWeight(message, "Выберите ваш вес");
-                    break;
-                case "170-180":
-                    sendMsgWeight(message, "Выберите ваш вес");
-                    break;
-                case "180-190":
-                    sendMsgWeight(message, "Выберите ваш вес");
-                    break;
-                case "Более 190":
-                    sendMsgWeight(message, "Выберите ваш вес");
-                    break;
-                case "Менее 40":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "40-45":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "45-50":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "50-55":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "55-60":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "60-65":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "65-70":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "70-75":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "75-80":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "80-90":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "90-100":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "Более 100":
-                    sendMsgType(message, "Что желаете?");
-                    break;
-                case "Снизить вес":
-                    sendMsg(message, "Кардио");
-                    break;
-                case "Поддерживать вес":
-                    sendMsg(message, "Так и живи, лол");
-                    break;
-                case "Набрать вес":
-                    sendMsg(message, "Силовые тренировки");
-                    break;
                 case "/start":
                     addUser();
-                    sendMsgSex(message, "Здравствуйте, рад вас видеть. Я помогу вам с вашими тренировками и питанием. Давайте укажем ваши данные. Выбирайте данные ниже. Ваш пол: ");
                     break;
-                case "Назад":
-                    sendMsgSex(message, "Выберите данные заново: ");
                 default:
 
             }
+
         }
     }
 
@@ -187,10 +127,18 @@ public class Bot extends TelegramLongPollingBot {
         SendMessage sendMessage = getSendMessage(message, text);
         sendMsgAndSetButton(sendMessage, "Weight");
     }
+    public void sendMsgActivity(Message message, String text) {
+        SendMessage sendMessage = getSendMessage(message, text);
+        sendMsgAndSetButton(sendMessage, "Activity");
+    }
 
     public void sendMsgProgram(Message message, String text) {
         SendMessage sendMessage = getSendMessage(message, text);
         sendMsgAndSetButton(sendMessage, "Program");
+    }
+    public void sendMsgDiet(Message message, String text) {
+        SendMessage sendMessage = getSendMessage(message, text);
+        sendMsgAndSetButton(sendMessage, "Diet");
     }
 
     public void sendMsg(Message message, String text) {
@@ -216,8 +164,14 @@ public class Bot extends TelegramLongPollingBot {
             case "Program":
                 setButtonsProgram(sendMessage);
                 break;
+            case "Diet":
+                setButtonsDiet(sendMessage);
+                break;
             case "Weight":
                 setButtonsWeight(sendMessage);
+                break;
+            case "Activity":
+                setButtonsActivity(sendMessage);
                 break;
             default:
         }
@@ -235,7 +189,8 @@ public class Bot extends TelegramLongPollingBot {
 
     public void setButtonsSex(SendMessage sendMessage) {
         List<KeyboardButton> firstRowButtons = setUpButtons("Мужской", "Женский");
-        setUpKeyboard(sendMessage, false, firstRowButtons);
+        List<KeyboardButton> secondRowButtons = setUpButtons("Функции");
+        setUpKeyboard(sendMessage, false, firstRowButtons, secondRowButtons);
     }
 
     public void setButtonsAge(SendMessage sendMessage) {
@@ -244,22 +199,38 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void setButtonsHeight(SendMessage sendMessage) {
-        List<KeyboardButton> firstRowButtons = setUpButtons("Менее 150", "150-160", "160-170");
-        List<KeyboardButton> secondRowButtons = setUpButtons("170-180", "180-190", "Более 190", "Назад");
+        List<KeyboardButton> firstRowButtons = setUpButtons("150-160", "160-170");
+        List<KeyboardButton> secondRowButtons = setUpButtons("170-180", "180-190", "190-200", "Назад");
         setUpKeyboard(sendMessage, false, firstRowButtons, secondRowButtons);
     }
 
     public void setButtonsWeight(SendMessage sendMessage) {
-        List<KeyboardButton> firstRowButtons = setUpButtons("Менее 40", "40-45", "50-55");
+        List<KeyboardButton> firstRowButtons = setUpButtons("40-45", "50-55");
         List<KeyboardButton> secondRowButtons = setUpButtons("55-60", "60-65", "65-70", "70-75");
         List<KeyboardButton> thirdRowButtons = setUpButtons("75-80", "80-90", "90-100", "100+", "Назад");
         setUpKeyboard(sendMessage, false, firstRowButtons, secondRowButtons, thirdRowButtons);
+    }
+    public void setButtonsActivity(SendMessage sendMessage) {
+        List<KeyboardButton> firstRowButtons = setUpButtons("Минимальный");
+        List<KeyboardButton> secondRowButtons = setUpButtons("Низкий");
+        List<KeyboardButton> thirdRowButtons = setUpButtons("Средний");
+        List<KeyboardButton> fourthRowButtons = setUpButtons("Высокий");
+        List<KeyboardButton> fifthRowButtons = setUpButtons("Очень высокий");
+        List<KeyboardButton> sixthRowButtons = setUpButtons("Назад");
+        setUpKeyboard(sendMessage, false, firstRowButtons, secondRowButtons, thirdRowButtons, fourthRowButtons, fifthRowButtons, sixthRowButtons);
     }
 
     public void setButtonsProgram(SendMessage sendMessage) {
         List<KeyboardButton> firstRowButtons = setUpButtons("Снизить вес");
         List<KeyboardButton> secondRowButtons = setUpButtons("Поддерживать вес");
         List<KeyboardButton> thirdRowButtons = setUpButtons("Набрать вес");
+        List<KeyboardButton> fourthRowButtons = setUpButtons("Назад");
+        setUpKeyboard(sendMessage, true, firstRowButtons, secondRowButtons, thirdRowButtons, fourthRowButtons);
+    }
+    public void setButtonsDiet(SendMessage sendMessage) {
+        List<KeyboardButton> firstRowButtons = setUpButtons("Диета для снижения веса");
+        List<KeyboardButton> secondRowButtons = setUpButtons("Диета для поддержания веса");
+        List<KeyboardButton> thirdRowButtons = setUpButtons("Диета для набора веса");
         List<KeyboardButton> fourthRowButtons = setUpButtons("Назад");
         setUpKeyboard(sendMessage, true, firstRowButtons, secondRowButtons, thirdRowButtons, fourthRowButtons);
     }
@@ -274,26 +245,9 @@ public class Bot extends TelegramLongPollingBot {
         }
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
     }
-/*
-    public void executeCommand(String command) {
-        if (command.contains("/remove")) {
-            msg.replace("/remove ", "");
-            DBManager.remove(command);
-        }
-        if (command.contains("/change")) {
-            command.replace("/change", "");
-            DBManager.change("gc", chat_id);
-        }
-        if (command.contains("/get")) {
-            DBManager.getChatID().toString();
-        }
-    }
-*/
-
     private void addUser() {
         DBManager.addUser(nameUser, Integer.parseInt(chat_id), nameReal);
     }
-    // private void addSex() {DBManager.addSex(sexUser); }
 
     public String getBotUsername() {
         return "CoachBot";
@@ -338,4 +292,4 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setText(text);
         return sendMessage;
     }
-}
+    }

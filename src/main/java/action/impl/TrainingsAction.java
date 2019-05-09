@@ -13,6 +13,6 @@ public class TrainingsAction implements Action {
 
     @Override
     public void execute(Message message) {
-        bot.sendMsgProgram(message, "Выберите: ");
+        bot.sendMsgProgram(message, "Выберите нужный тип программы: ");
     }
 }
