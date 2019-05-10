@@ -22,7 +22,7 @@ public class DBManager {
     static {
         try {
             Class.forName("org.postgresql.Driver");
-            con = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/myProgram", "postgres","keufycr1997");
+            con = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/myProgram", "postgres","");
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
