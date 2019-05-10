@@ -6,8 +6,6 @@ public class User {
     private String realName;
     private String sex;
     private String age;
-    private String trainProgramId;
-    private String dietProgramId;
     private String height;
     private String weight;
     private String activity;
@@ -15,14 +13,12 @@ public class User {
     public User() {
     }
 
-    public User(int chatId, String name, String realName, String sex, String age, String trainProgramId, String dietProgramId, String height, String weight, String activity) {
+    public User(int chatId, String name, String realName, String sex, String age, String height, String weight, String activity) {
         this.chatId = chatId;
         this.name = name;
         this.realName = realName;
         this.sex = sex;
         this.age = age;
-        this.trainProgramId = trainProgramId;
-        this.dietProgramId = dietProgramId;
         this.height = height;
         this.weight = weight;
         this.activity = activity;
@@ -64,22 +60,6 @@ public class User {
 
     public void setAge(String age) {
         this.age = age;
-    }
-
-    public String getTrainProgramId() {
-        return trainProgramId;
-    }
-
-    public void setTrainProgramId(String trainProgramId) {
-        this.trainProgramId = trainProgramId;
-    }
-
-    public String getDietProgramId() {
-        return dietProgramId;
-    }
-
-    public void setDietProgramId(String dietProgramId) {
-        this.dietProgramId = dietProgramId;
     }
 
     public String getHeight() {

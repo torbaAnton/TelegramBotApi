@@ -1,6 +1,5 @@
 package login;
 
-import enteties.Diet;
 import enteties.Program;
 import enteties.User;
 
@@ -15,8 +14,6 @@ public class DBManager {
     private static final String UPDATE_ACTIVITY_SQL ="UPDATE users SET activity = ? WHERE chat_id = ?";
     private static final String GET_PROGRAM_BY_AGE_AND_SEX_SQL = "SELECT * FROM train_programs WHERE age = ? AND sex = ?";
     private static final String GET_USER_SQL = "SELECT * FROM users WHERE chat_id = ?";
-    private static final String GET_PROGRAM_BY_AGE_AND_SEX_AND_HEIGHT_AND_WEIGHT_AND_ACTIVITY_SQL = "SELECT * FROM diet_programs WHERE age = ? AND sex = ? AND height = ? AND weight = ?" +
-            "AND activity = ?";
     private static Connection con;
     private Statement st;
     private ResultSet rs;
@@ -63,11 +60,9 @@ public class DBManager {
                 user = new User();
                 user.setAge(resultSet.getString("age"));
                 user.setChatId(resultSet.getInt("chat_id"));
-                user.setDietProgramId(resultSet.getString("diet_program_id"));
                 user.setName(resultSet.getString("name"));
                 user.setRealName(resultSet.getString("real_name"));
                 user.setSex(resultSet.getString("sex"));
-                user.setTrainProgramId(resultSet.getString("train_program_id"));
                 user.setHeight(resultSet.getString("height"));
                 user.setWeight(resultSet.getString("weight"));
                 user.setActivity(resultSet.getString("activity"));
@@ -109,27 +104,6 @@ public class DBManager {
             System.out.println("Error" + e);
         }
         return program;
-    }
-    public Diet getDietByAgeAndSexAndHeightAndWeightAndActivity(String age, String sex, String height, String weight, String activity){
-        Diet diet = null;
-        try {
-            PreparedStatement pstm = con.prepareStatement(GET_PROGRAM_BY_AGE_AND_SEX_AND_HEIGHT_AND_WEIGHT_AND_ACTIVITY_SQL);
-            pstm.setString(1, age);
-            pstm.setString(2, sex);
-            pstm.setString(3, height);
-            pstm.setString(4, weight);
-            pstm.setString(5, activity);
-            ResultSet resultSet = pstm.executeQuery();
-            if (resultSet.next()) {
-                diet = new Diet();
-                diet.setDietBulk(resultSet.getString("bulk_diet"));
-                diet.setDietFatLoss(resultSet.getString("fat_loss_diet"));
-                diet.setDietFit(resultSet.getString("keep_fit_diet"));
-            }
-        } catch (SQLException e) {
-            System.out.println("Error" + e);
-        }
-        return diet;
     }
 
 

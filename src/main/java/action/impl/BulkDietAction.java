@@ -3,9 +3,6 @@ package action.impl;
 import action.Action;
 import add.FormulaForCalories;
 import bot.Bot;
-import enteties.Diet;
-import enteties.User;
-import login.DBManager;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public class BulkDietAction implements Action {
@@ -16,16 +13,7 @@ public class BulkDietAction implements Action {
     }
     @Override
     public void execute(Message message) {
-        DBManager dbManager = DBManager.getInstance();
-        User user = dbManager.getUser(Math.toIntExact(message.getChatId()));
-        String age = user.getAge();
-        String sex = user.getSex();
-        String height = user.getHeight();
-        String weight = user.getWeight();
-        String activity = user.getActivity();
-        Diet diet = dbManager.getDietByAgeAndSexAndHeightAndWeightAndActivity(age, sex, height, weight, activity);
-//        String dietBulk = diet.getDietBulk();
         double calories = FormulaForCalories.calculateCalorie(message);
-        bot.sendMsg(message, (calories + 500) + " калорий");
+        bot.sendMsg(message, (calories + 500) + " калорий вам нужно потреблять, чтобы набирать мышечную массу при правильных силовых тренировках");
     }
 }
